@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ecoguard_postgres
+    environment:
+      POSTGRES_USER: ecoguard
+      POSTGRES_PASSWORD: ecoguard_pw
+      POSTGRES_DB: ecoguard_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - ecoguard_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecoguard -d ecoguard_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: ecoguard_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ecoguard.local
+      PGADMIN_DEFAULT_PASSWORD: admin_pw
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  ecoguard_pgdata:
