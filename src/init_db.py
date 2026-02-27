@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS predictions (
 );
 """
 
+
 def main():
     conn = psycopg2.connect(
         host="127.0.0.1",
@@ -29,6 +30,7 @@ def main():
     cur.close()
     conn.close()
     print("Table 'predictions' ready ✅")
+
 
 if __name__ == "__main__":
     main()

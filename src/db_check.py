@@ -1,5 +1,6 @@
 import psycopg2
 
+
 def main():
     conn = psycopg2.connect(
         host="127.0.0.1",
@@ -14,6 +15,7 @@ def main():
     cur.close()
     conn.close()
     print("Postgres connection ✅")
+
 
 if __name__ == "__main__":
     main()

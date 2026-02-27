@@ -2,15 +2,19 @@ from __future__ import annotations
 
 import os
 
-os.environ["SKIP_DB"] = "1"
-
+import pytest
 from fastapi.testclient import TestClient
-from deployments.fastapi_app.main import app
-
-client = TestClient(app)
 
 
-def test_health_ok():
+@pytest.fixture(scope="session")
+def client():
+    os.environ["SKIP_DB"] = "1"
+    from deployments.fastapi_app.main import app  # import after env set
+
+    return TestClient(app)
+
+
+def test_health_ok(client):
     r = client.get("/health")
     assert r.status_code == 200
     data = r.json()
@@ -19,8 +23,7 @@ def test_health_ok():
     assert "n_features" in data
 
 
-def test_predict_happy_path():
-    # partial features are allowed; API fills missing with 0.0
+def test_predict_happy_path(client):
     payload = {
         "features": {
             "CO(GT)": 2.6,

@@ -9,28 +9,20 @@ import mlflow
 import mlflow.sklearn
 import numpy as np
 import pandas as pd
-
 from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import (GradientBoostingRegressor,
+                              RandomForestClassifier, RandomForestRegressor,
+                              StackingClassifier)
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import (
-    accuracy_score,
-    classification_report,
-    confusion_matrix,
-    f1_score,
-    mean_squared_error,
-    precision_score,
-    r2_score,
-    recall_score,
-    roc_auc_score,
-)
+from sklearn.linear_model import LogisticRegression, Ridge
+from sklearn.metrics import (accuracy_score, classification_report,
+                             confusion_matrix, f1_score, mean_squared_error,
+                             precision_score, r2_score, recall_score,
+                             roc_auc_score)
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-
-from sklearn.linear_model import LogisticRegression, Ridge
 from sklearn.svm import SVC, SVR
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingRegressor, StackingClassifier
-from sklearn.ensemble import RandomForestRegressor
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = PROJECT_ROOT / "data" / "processed" / "dataset_processed.csv"
@@ -42,6 +34,8 @@ EXPERIMENT_NAME = "ecoguard-lite-phase1"
 MLFLOW_DB = f"sqlite:///{(PROJECT_ROOT / 'mlflow.db').as_posix()}"
 mlflow.set_tracking_uri(MLFLOW_DB)
 mlflow.set_registry_uri(MLFLOW_DB)
+
+
 def save_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
@@ -50,8 +44,12 @@ def save_text(path: Path, text: str) -> None:
 def evaluate_classification(y_true, y_pred, y_proba=None) -> dict:
     metrics = {
         "accuracy": float(accuracy_score(y_true, y_pred)),
-        "precision_macro": float(precision_score(y_true, y_pred, average="macro", zero_division=0)),
-        "recall_macro": float(recall_score(y_true, y_pred, average="macro", zero_division=0)),
+        "precision_macro": float(
+            precision_score(y_true, y_pred, average="macro", zero_division=0)
+        ),
+        "recall_macro": float(
+            recall_score(y_true, y_pred, average="macro", zero_division=0)
+        ),
         "f1_macro": float(f1_score(y_true, y_pred, average="macro", zero_division=0)),
     }
     # ROC-AUC only if probabilities are provided and multi-class compatible
@@ -73,9 +71,12 @@ def evaluate_regression(y_true, y_pred) -> dict:
         "r2": float(r2_score(y_true, y_pred)),
     }
 
+
 def main() -> None:
     if not DATA_PATH.exists():
-        raise FileNotFoundError(f"Missing processed dataset: {DATA_PATH}. Run preprocessing first.")
+        raise FileNotFoundError(
+            f"Missing processed dataset: {DATA_PATH}. Run preprocessing first."
+        )
 
     df = pd.read_csv(DATA_PATH)
     # Features and targets
@@ -257,8 +258,12 @@ def main() -> None:
         mlflow.log_artifact(str(best_reg_path))
 
     print("✅ Training done.")
-    print(f"Best classifier: {best_cls_name} (F1_macro={best_f1:.4f}) saved to {best_cls_path}")
-    print(f"Best regressor : {best_reg_name} (RMSE={best_rmse:.4f}) saved to {best_reg_path}")
+    print(
+        f"Best classifier: {best_cls_name} (F1_macro={best_f1:.4f}) saved to {best_cls_path}"
+    )
+    print(
+        f"Best regressor : {best_reg_name} (RMSE={best_rmse:.4f}) saved to {best_reg_path}"
+    )
 
 
 if __name__ == "__main__":

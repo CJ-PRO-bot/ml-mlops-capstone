@@ -14,15 +14,18 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.http import JsonResponse
-from django.urls import path, include
+from django.urls import include, path
+
 
 def root(request):
     return JsonResponse({"message": "EcoGuard Django API running. Try /api/health"})
 
+
 urlpatterns = [
-    path("", root),                     # GET /
-    path("admin/", admin.site.urls),    # Admin
+    path("", root),  # GET /
+    path("admin/", admin.site.urls),  # Admin
     path("api/", include("api.urls")),  # Your API endpoints
 ]

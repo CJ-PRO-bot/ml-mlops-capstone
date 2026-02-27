@@ -1,6 +1,8 @@
-import streamlit as st
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
+import streamlit as st
+
 
 def find_repo_root(start: Path) -> Path:
     p = start
@@ -9,6 +11,7 @@ def find_repo_root(start: Path) -> Path:
             return p
         p = p.parent
     return start.parents[2]  # fallback
+
 
 PROJECT_ROOT = find_repo_root(Path(__file__).resolve())
 DATA_PATH = PROJECT_ROOT / "data" / "processed" / "dataset_processed.csv"

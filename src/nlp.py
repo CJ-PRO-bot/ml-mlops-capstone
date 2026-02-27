@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 
 @dataclass
@@ -55,7 +55,11 @@ def classify_text(text: str) -> NLPResult:
         t = text.lower()
         score = sum(w in t for w in pos_words) - sum(w in t for w in neg_words)
         label = "POSITIVE" if score >= 0 else "NEGATIVE"
-        return NLPResult(ok=True, detail=f"fallback ({type(e).__name__})", data={"label": label, "score": float(score)})
+        return NLPResult(
+            ok=True,
+            detail=f"fallback ({type(e).__name__})",
+            data={"label": label, "score": float(score)},
+        )
 
 
 def qa_over_readme(question: str, project_root: Path | None = None) -> NLPResult:
@@ -93,5 +97,9 @@ def qa_over_readme(question: str, project_root: Path | None = None) -> NLPResult
         return NLPResult(
             ok=True,
             detail=f"fallback ({type(e).__name__})",
-            data={"answer": retrieved[:800], "score": 0.0, "note": "Fallback retrieval answer"},
+            data={
+                "answer": retrieved[:800],
+                "score": 0.0,
+                "note": "Fallback retrieval answer",
+            },
         )

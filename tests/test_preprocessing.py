@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from src.preprocessing import load_raw, clean_and_engineer, impute_missing
+from src.preprocessing import clean_and_engineer, impute_missing, load_raw
 
 
 def test_load_raw_has_columns():

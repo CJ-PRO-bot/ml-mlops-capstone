@@ -6,7 +6,6 @@ from pathlib import Path
 import mlflow
 import numpy as np
 import pandas as pd
-
 from sklearn.cluster import DBSCAN, KMeans
 from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
@@ -40,7 +39,7 @@ def main() -> None:
 
     # PCA for 2D visualization (and feature compression)
     pca = PCA(n_components=2, random_state=42)
-    X2 = pca.fit_transform(Xs)
+    _ = pca.fit_transform(Xs)
 
     mlflow.set_experiment(EXPERIMENT_NAME)
 
@@ -84,7 +83,9 @@ def main() -> None:
             try:
                 if n_clusters >= 2:
                     # silhouette score requires >1 label
-                    sil = float(silhouette_score(Xs[labels != -1], labels[labels != -1]))
+                    sil = float(
+                        silhouette_score(Xs[labels != -1], labels[labels != -1])
+                    )
                     mlflow.log_metric("silhouette_non_noise", sil)
             except Exception:
                 pass

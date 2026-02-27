@@ -6,13 +6,11 @@ from pathlib import Path
 import mlflow
 import numpy as np
 import pandas as pd
-
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-
 # Keras
 import tensorflow as tf
-from tensorflow.keras import layers, regularizers, callbacks
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from tensorflow.keras import callbacks, layers, regularizers
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = PROJECT_ROOT / "data" / "processed" / "dataset_processed.csv"
@@ -38,7 +36,11 @@ def build_model(
     for h in hidden:
         x = layers.Dense(
             h,
-            kernel_initializer="he_normal" if activation.lower().startswith("relu") else "glorot_uniform",
+            kernel_initializer=(
+                "he_normal"
+                if activation.lower().startswith("relu")
+                else "glorot_uniform"
+            ),
             kernel_regularizer=regularizers.l2(l2) if l2 > 0 else None,
         )(x)
         x = layers.BatchNormalization()(x)
@@ -46,7 +48,9 @@ def build_model(
         if dropout > 0:
             x = layers.Dropout(dropout)(x)
 
-    out = layers.Dense(3, activation="softmax")(x)  # assuming 3 classes; adjust if needed
+    out = layers.Dense(3, activation="softmax")(
+        x
+    )  # assuming 3 classes; adjust if needed
     return tf.keras.Model(inp, out)
 
 
@@ -58,7 +62,9 @@ def main() -> None:
     # Ensure classes count (change 3 above if your y_cls has different)
     n_classes = int(np.unique(y).size)
     if n_classes != 3:
-        print(f"⚠️ Detected {n_classes} classes. Update final Dense layer to {n_classes}.")
+        print(
+            f"⚠️ Detected {n_classes} classes. Update final Dense layer to {n_classes}."
+        )
         # quick auto-fix:
         # (for assignment, you can set it manually)
         # return
@@ -74,9 +80,30 @@ def main() -> None:
     mlflow.set_experiment(EXPERIMENT_NAME)
 
     configs = [
-        {"hidden": [128, 64], "activation": "relu", "dropout": 0.2, "l2": 1e-4, "lr": 1e-3, "opt": "adam"},
-        {"hidden": [256, 128, 64], "activation": "relu", "dropout": 0.3, "l2": 1e-4, "lr": 5e-4, "opt": "rmsprop"},
-        {"hidden": [128, 64], "activation": "tanh", "dropout": 0.2, "l2": 1e-3, "lr": 1e-3, "opt": "adam"},
+        {
+            "hidden": [128, 64],
+            "activation": "relu",
+            "dropout": 0.2,
+            "l2": 1e-4,
+            "lr": 1e-3,
+            "opt": "adam",
+        },
+        {
+            "hidden": [256, 128, 64],
+            "activation": "relu",
+            "dropout": 0.3,
+            "l2": 1e-4,
+            "lr": 5e-4,
+            "opt": "rmsprop",
+        },
+        {
+            "hidden": [128, 64],
+            "activation": "tanh",
+            "dropout": 0.2,
+            "l2": 1e-3,
+            "lr": 1e-3,
+            "opt": "adam",
+        },
     ]
 
     for i, cfg in enumerate(configs, start=1):

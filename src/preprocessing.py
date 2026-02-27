@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
 # --- Paths (no src import needed, avoids ModuleNotFound issues) ---
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -25,7 +26,9 @@ def clean_and_engineer(df: pd.DataFrame) -> pd.DataFrame:
     # Parse datetime
     dt = pd.to_datetime(df["Date"], dayfirst=True, errors="coerce")
     tm = pd.to_datetime(df["Time"], format="%H.%M.%S", errors="coerce").dt.time
-    df["timestamp"] = pd.to_datetime(dt.astype(str) + " " + tm.astype(str), errors="coerce")
+    df["timestamp"] = pd.to_datetime(
+        dt.astype(str) + " " + tm.astype(str), errors="coerce"
+    )
 
     # Time features
     df["hour"] = df["timestamp"].dt.hour
@@ -51,7 +54,11 @@ def clean_and_engineer(df: pd.DataFrame) -> pd.DataFrame:
     df["y_cls"] = df["y_reg"].apply(to_class).astype(int)
 
     # Drop leak/non-usable cols
-    df = df.drop(columns=[c for c in ["Date", "Time", "timestamp", "C6H6(GT)"] if c in df.columns])
+    df = df.drop(
+        columns=[
+            c for c in ["Date", "Time", "timestamp", "C6H6(GT)"] if c in df.columns
+        ]
+    )
 
     # Force numeric for feature columns
     for c in df.columns:

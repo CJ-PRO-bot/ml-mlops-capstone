@@ -1,7 +1,8 @@
 from __future__ import annotations
-import os
+
 import json
-import time
+import os
+
 import psycopg2
 
 
@@ -15,7 +16,13 @@ def get_conn():
     )
 
 
-def insert_prediction(model_name: str, model_version: str | None, input_obj: dict, pred_obj: dict, latency_ms: int) -> int:
+def insert_prediction(
+    model_name: str,
+    model_version: str | None,
+    input_obj: dict,
+    pred_obj: dict,
+    latency_ms: int,
+) -> int:
     conn = get_conn()
     cur = conn.cursor()
     cur.execute(
@@ -37,6 +44,7 @@ def insert_prediction(model_name: str, model_version: str | None, input_obj: dic
     cur.close()
     conn.close()
     return int(new_id)
+
 
 def fetch_latest_predictions(limit: int = 10):
     with get_conn() as conn:

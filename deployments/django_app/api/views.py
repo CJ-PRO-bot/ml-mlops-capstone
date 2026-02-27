@@ -21,7 +21,9 @@ FEATURES = [c for c in df.columns if c not in ("y_cls", "y_reg")]
 
 
 def health(request):
-    return JsonResponse({"status": "ok", "model": "best_classifier", "n_features": len(FEATURES)})
+    return JsonResponse(
+        {"status": "ok", "model": "best_classifier", "n_features": len(FEATURES)}
+    )
 
 
 @csrf_exempt

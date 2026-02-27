@@ -7,20 +7,33 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Prediction',
+            name="Prediction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('model_name', models.CharField(default='best_classifier', max_length=100)),
-                ('model_version', models.CharField(blank=True, max_length=50, null=True)),
-                ('input_obj', models.JSONField()),
-                ('pred_obj', models.JSONField()),
-                ('latency_ms', models.IntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "model_name",
+                    models.CharField(default="best_classifier", max_length=100),
+                ),
+                (
+                    "model_version",
+                    models.CharField(blank=True, max_length=50, null=True),
+                ),
+                ("input_obj", models.JSONField()),
+                ("pred_obj", models.JSONField()),
+                ("latency_ms", models.IntegerField()),
             ],
         ),
     ]

@@ -23,9 +23,13 @@ DB_CFG = dict(
 
 def main() -> None:
     if not MODEL_PATH.exists():
-        raise FileNotFoundError(f"Model not found: {MODEL_PATH}. Run train_classical.py first.")
+        raise FileNotFoundError(
+            f"Model not found: {MODEL_PATH}. Run train_classical.py first."
+        )
     if not DATA_PATH.exists():
-        raise FileNotFoundError(f"Dataset not found: {DATA_PATH}. Run preprocessing first.")
+        raise FileNotFoundError(
+            f"Dataset not found: {DATA_PATH}. Run preprocessing first."
+        )
 
     df = pd.read_csv(DATA_PATH)
     X = df.drop(columns=["y_cls", "y_reg"])
