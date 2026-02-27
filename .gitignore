@@ -22,14 +22,19 @@ Thumbs.db
 
 # Logs & artifacts
 *.log
-mlruns/
-artifacts/
 
 # Data (keep raw/processed locally)
 data/raw/*
 data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
-
-mlflow.db
 *.pyc
+
+# MLflow tracking (can be huge)
+mlruns/
+mlflow.db
+
+# Keep small curated artifacts, ignore heavy/generated cache if any
+# (Do NOT ignore artifacts/ entirely, since we submit results tables)
+artifacts/**/__pycache__/
+artifacts/**/*.tmp
