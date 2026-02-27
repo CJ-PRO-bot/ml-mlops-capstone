@@ -3,29 +3,87 @@ services:
     image: postgres:16-alpine
     container_name: ecoguard_postgres
     environment:
+      POSTGRES_DB: ecoguard
       POSTGRES_USER: ecoguard
       POSTGRES_PASSWORD: ecoguard_pw
-      POSTGRES_DB: ecoguard_db
     ports:
       - "5433:5432"
     volumes:
-      - ecoguard_pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ecoguard -d ecoguard_db"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U ecoguard -d ecoguard"]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   pgadmin:
     image: dpage/pgadmin4:8
     container_name: ecoguard_pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@ecoguard.local
-      PGADMIN_DEFAULT_PASSWORD: admin_pw
+      PGADMIN_DEFAULT_EMAIL: admin@ecoguard.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
     ports:
       - "5050:80"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+
+  mlflow:
+    image: python:3.10-slim
+    container_name: ecoguard_mlflow
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - mlruns:/mlruns
+    ports:
+      - "5000:5000"
+    command: >
+      bash -lc "
+      pip install -q mlflow==2.14.3 &&
+      mlflow ui --host 0.0.0.0 --port 5000
+        --backend-store-uri sqlite:////app/mlflow.db
+        --default-artifact-root /mlruns
+      "
+
+  fastapi:
+    image: python:3.10-slim
+    container_name: ecoguard_fastapi
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    environment:
+      PYTHONPATH: "/app"
+      DATABASE_URL: "postgresql://ecoguard:ecoguard123@postgres:5432/ecoguard"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      bash -lc "
+      pip install -q -r requirements.txt &&
+      uvicorn deployments.fastapi_app.main:app --host 0.0.0.0 --port 8000
+      "
+
+  streamlit:
+    image: python:3.10-slim
+    container_name: ecoguard_streamlit
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "8501:8501"
+    environment:
+      PYTHONPATH: "/app"
+    depends_on:
+      fastapi:
+        condition: service_started
+    command: >
+      bash -lc "
+      pip install -q -r requirements.txt &&
+      streamlit run deployments/streamlit_app/Home.py --server.port 8501 --server.address 0.0.0.0
+      "
 
 volumes:
-  ecoguard_pgdata:
+  pgdata:
+  mlruns:

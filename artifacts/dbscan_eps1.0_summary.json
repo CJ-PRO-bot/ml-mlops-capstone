@@ -1,0 +1,11 @@
+{
+  "eps": 1.0,
+  "min_samples": 8,
+  "n_clusters_excluding_noise": 57,
+  "noise_points": 4492,
+  "silhouette_non_noise": -0.20835578537560265,
+  "pca_explained_variance_ratio": [
+    0.40426919271511946,
+    0.17296335679352492
+  ]
+}
