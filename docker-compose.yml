@@ -35,15 +35,15 @@ services:
     volumes:
       - ./:/app
       - mlruns:/mlruns
+      - mlflowdb:/mlflowdb
     ports:
       - "5000:5000"
     command: >
       bash -lc "
-      pip install -q mlflow==2.14.3 &&
+      pip install -q -r requirements-docker.txt &&
       mlflow ui --host 0.0.0.0 --port 5000
-        --backend-store-uri sqlite:////app/mlflow.db
-        --default-artifact-root /mlruns
-      "
+        --backend-store-uri sqlite:////mlflowdb/mlflow.db
+        --default-artifact-root /mlruns"
 
   fastapi:
     image: python:3.10-slim
@@ -55,15 +55,14 @@ services:
       - "8000:8000"
     environment:
       PYTHONPATH: "/app"
-      DATABASE_URL: "postgresql://ecoguard:ecoguard123@postgres:5432/ecoguard"
+      DATABASE_URL: "postgresql://ecoguard:ecoguard_pw@postgres:5432/ecoguard"
+      SKIP_DB: "1"
     depends_on:
       postgres:
         condition: service_healthy
     command: >
-      bash -lc "
-      pip install -q -r requirements.txt &&
-      uvicorn deployments.fastapi_app.main:app --host 0.0.0.0 --port 8000
-      "
+      bash -lc "pip install --default-timeout=200 --retries 10 -r requirements-docker.txt
+      && uvicorn deployments.fastapi_app.main:app --host 0.0.0.0 --port 8000"
 
   streamlit:
     image: python:3.10-slim
@@ -75,15 +74,15 @@ services:
       - "8501:8501"
     environment:
       PYTHONPATH: "/app"
+      API_URL: "http://fastapi:8000"
     depends_on:
       fastapi:
         condition: service_started
     command: >
-      bash -lc "
-      pip install -q -r requirements.txt &&
-      streamlit run deployments/streamlit_app/Home.py --server.port 8501 --server.address 0.0.0.0
-      "
+      bash -lc "pip install --default-timeout=200 --retries 10 -r requirements-docker.txt
+      && streamlit run deployments/streamlit_app/Home.py --server.port 8501 --server.address 0.0.0.0"
 
 volumes:
   pgdata:
   mlruns:
+  mlflowdb:
