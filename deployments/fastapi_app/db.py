@@ -3,10 +3,23 @@ from __future__ import annotations
 import json
 import os
 
-import psycopg2
+
+def _db_enabled() -> bool:
+    # If SKIP_DB=1 (or true), we do not touch postgres at all.
+    return str(os.getenv("SKIP_DB", "0")).lower() not in ("1", "true", "yes", "y")
 
 
 def get_conn():
+    if not _db_enabled():
+        raise RuntimeError("DB logging disabled (SKIP_DB=1).")
+
+    try:
+        import psycopg2  # imported only when needed
+    except Exception as e:
+        raise RuntimeError(
+            "psycopg2 is not available. Install requirements or set SKIP_DB=1 to run without DB."
+        ) from e
+
     return psycopg2.connect(
         host=os.getenv("PGHOST", "127.0.0.1"),
         port=int(os.getenv("PGPORT", "5433")),
@@ -23,6 +36,10 @@ def insert_prediction(
     pred_obj: dict,
     latency_ms: int,
 ) -> int:
+    # No-op in demo mode
+    if not _db_enabled():
+        return -1
+
     conn = get_conn()
     cur = conn.cursor()
     cur.execute(
@@ -47,6 +64,9 @@ def insert_prediction(
 
 
 def fetch_latest_predictions(limit: int = 10):
+    if not _db_enabled():
+        return []
+
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -59,6 +79,7 @@ def fetch_latest_predictions(limit: int = 10):
                 (limit,),
             )
             rows = cur.fetchall()
+
     out = []
     for r in rows:
         out.append(

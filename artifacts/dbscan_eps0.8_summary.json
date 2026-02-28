@@ -4,6 +4,7 @@
   "n_clusters_excluding_noise": 72,
   "noise_points": 7807,
   "silhouette_non_noise": 0.3036647092540948,
+  "davies_bouldin_non_noise": 0.9663382577313526,
   "pca_explained_variance_ratio": [
     0.40426919271511946,
     0.17296335679352492

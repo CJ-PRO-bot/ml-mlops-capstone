@@ -3,45 +3,52 @@
 # EcoGuard Lite (ML + MLOps)
 
 ## What it does
-Air quality dataset → preprocessing → train models → track experiments in MLflow → serve predictions with FastAPI → UI with Streamlit → log predictions to Postgres.
+Air quality dataset → preprocessing → train models → track experiments in MLflow → serve predictions with FastAPI/Flask/Django → UI with Streamlit → (optional) log predictions to Postgres.
 
 ## Repository structure
-- `src/` — preprocessing, training, inference utilities
+- `src/` — preprocessing, training, clustering, inference utilities
 - `deployments/` — FastAPI, Flask, Django, Streamlit apps
-- `notebooks/` — EDA, ANN, NLP, transfer learning experiments
+- `notebooks/` — EDA/ANN/NLP/transfer learning experiments (Colab-exported)
 - `tests/` — pytest tests
-- `docker-compose.yml` — local Postgres + pgAdmin
+- `artifacts/` — trained models + reports + summaries
+- `docker-compose.yml` — local Postgres + pgAdmin + MLflow
 - `.github/workflows/ci.yml` — CI pipeline (ruff + pytest)
 
-## Notebooks delivered (ML requirements)
-- `notebooks/01_EDA.ipynb` — EDA on breast cancer dataset
-- `notebooks/02_ANN.ipynb` — ANN experiments (dropout/L2/LR)
-- `notebooks/03_NLP.ipynb` — NLP tasks (sentiment + QA) with metrics
-- `notebooks/04_transfer_learning.ipynb` — transfer learning (freeze vs fine-tune) with comparison
+## Note about notebooks (why different dataset)
+Some notebooks were trained on Google Colab due to limited local compute / no CUDA.
+They are included as supporting evidence of Deep Learning + NLP work.
+The core end-to-end pipeline code (in `src/` + `deployments/`) uses the processed AirQuality dataset.
 
 ## Quickstart (local)
 ```bash
 python -m venv .venv
-# Windows
+# Windows:
 .\.venv\Scripts\activate
+
 pip install -r requirements.txt
 pip install -r requirements-dev.txt
-Preprocess + Train (examples)
+
+# Preprocess + Train
 python src/preprocessing.py
 python src/train_classical.py
 python src/train_ann.py
-Run MLflow
+python src/clustering.py
+
+# Run MLflow UI (optional if using docker-compose MLflow)
 mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
-Run FastAPI
+
+# Run FastAPI
 uvicorn deployments.fastapi_app.main:app --reload --port 8000
 # Open: http://127.0.0.1:8000/docs
-Run Streamlit
+
+# Run Streamlit
 streamlit run deployments/streamlit_app/Home.py
-Run tests
+
+# Run tests
 pytest -q
-Docker (Postgres + pgAdmin)
+
+# Docker services (Postgres + pgAdmin + MLflow)
 docker compose up --build
 
-pgAdmin: http://localhost:5050
-
-Postgres exposed on: localhost:5433
+# pgAdmin: http://localhost:5050
+# Postgres: localhost:5433
