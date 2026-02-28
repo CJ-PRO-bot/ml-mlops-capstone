@@ -1,8 +1,20 @@
+setuptools
+wheel
+
+# Lightweight NLP
+vaderSentiment
+
+# API + UI
 fastapi
 uvicorn[standard]
 streamlit
+
+# ML utils
 pandas
 numpy
 scikit-learn
+joblib
+
+# Tracking + DB
 mlflow==2.14.3
 psycopg2-binary
