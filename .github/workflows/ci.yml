@@ -10,7 +10,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      SKIP_DB: "1"   # so tests don't need Postgres
+      SKIP_DB: "1"     # so tests don't need Postgres
+      SKIP_DATA: "1"   # so CI doesn't require local CSV datasets
 
     steps:
       - name: Checkout Repository
